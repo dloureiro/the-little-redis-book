@@ -782,57 +782,61 @@ imaginé dans un premier temps.
 
 # Chapter 4 - Beyond The Data Structures
 
-While the five data structures form the foundation of Redis, there are other commands which aren't data structure
-specific. We've already seen a handful of these: `info`, `select`, `flushdb`, `multi`, `exec`, `discard`, `watch` and
-`keys`. This chapter will look at some of the other important ones.
+Tandis que les cinq structures de données de Redis en forme les fondations, il y a un certain nombre d'autres
+commandes qui ne sont pas liées spécifiquement à une structure de données spécifique. Nous en avons déjà vu un nombre
+ significatif : `info`, `select`, `flushdb`, `multi`, `exec`, `discard`, `watch` et `keys`. Ce chapitre va se pencher
+  sur d'autres tout aussi importantes.
 
 ## Expiration
 
-Redis allows you to mark a key for expiration. You can give it an absolute time in the form of a Unix timestamp
-(seconds since January 1, 1970) or a time to live in seconds. This is a key-based command, so it doesn't matter what
-type of data structure the key represents.
+Redis permet de marquer des clées comme devant expirer à une certaine date. Vous pouvez leur donner une date absolue
+sous la forme d'un timestamp Unix (le nombre de secondes depuis le premier janvier 1970) ou un temps à vivre en
+secondes. C'est une commande intervenant sur les clées, et c'est pour cela que la structure de données sous-jacente
+n'a pas d'importance.
 
 	expire pages:about 30
 	expireat pages:about 1356933600
 
-The first command will delete the key (and associated value) after 30 seconds. The second will do the same at 12:00
-a.m. December 31st, 2012.
+La première commande va supprimer la clée (et donc la valeur associée) après 30 secondes. La seconde va faire la même
+ chose à 12:00 le 31 décembre 2012.
 
-This makes Redis an ideal caching engine. You can find out how long an item has to live until via the `ttl` command
-and you can remove the expiration on a key via the `persist` command:
+Ceci fait de Redis le moteur de cache idéal. Vous pouvez savoir le temps restant à vivre (ou Time To Live en anglais)
+ grâce à la commande `ttl` et vous pouvez lever l'expiration sur une clée grâce à la commande `persist` :
 
 	ttl pages:about
 	persist pages:about
 
-Finally, there's a special string command, `setex` which lets you set a string and specify a time to live in a single
-atomic command (this is more for convenience than anything else):
+Enfin, il y a une commande spéciale pour les String `setex` qui vous permet de fixer une String,
+et de spécifier un temps restant à vivre en une seule commande atomique (ceci est plutôt fait pour une histoire de
+simplicité qu'autre chose) :
 
 	setex pages:about 30 '<h1>about us</h1>....'
 
-## Publication and Subscriptions
+## Publication and Souscriptions
 
-Redis lists have an `blpop` and `brpop` command which returns and removes the first (or last) element from the list or
-blocks until one is available. These can be used to power a simple queue.
+Les Listes Redis ont des commandes `blpop` et `brpop` qui retournent et suppriment le premier (ou dernier)
+éléments de la Liste ou bloque jusqu'à qu'il y en ai un de disponible. Ces commandes peuvent être utilisées pour
+mettre en place une simple queue.
 
-Beyond this, Redis has first-class support for publishing messages and subscribing to channels. You can try this out
-yourself by opening a second `redis-cli` window. In the first window subscribe to a channel (we'll call it `warnings`):
+Au-delà de cela, Redis possède un support de grande qualité pour la publication de messages et la souscription à des
+channels. Vous pouvez essayer cela vous-même en ouvrant une seconde fenêtre sur l'interface en ligne de commande.
+Dans la première fenêtre souscrivez à un channel (nous l'appelerons `warnings`) :
 
 	subscribe warnings
 
-The reply is the information of your subscription. Now, in the other window, publish a message to the `warnings`
-channel:
+La réponse est l'information prouvant la souscription. Maintenant, dans l'autre fenêtre,
+publiez un message ver le channel `warnings` :
 
 	publish warnings "it's over 9000!"
 
-If you go back to your first window you should have received the message to the `warnings` channel.
+Si vous retournez à votre première fenêtre, vous devriez avoir reçu le message envoyé au channel `warnings`.
 
-You can subscribe to multiple channels (`subscribe channel1 channel2 ...`), subscribe to a pattern of channels
-(`psubscribe warnings:*`) and use the `unsubscribe` and `punsubscribe` commands to stop listening to one or more
-channels, or a channel pattern.
+Vous pouvez souscrire à de multiples channels (`subscribe channel1 channel2 ...`),
+souscrire à un pattern de channel (`psubscribe warnings:*`) et enfin utiliser les commandes `unsubscribe` et
+`punsubscribe` pour arrêter d'écouter à un ou plusieurs channel, ainsi qu'aux patterns de channel.
 
-Finally, notice that the `publish` command returned the value 1. This indicates the number of clients that received the
-message.
-
+Enfin, il est important de noter que la commande `publish` retourne la valeur 1. Ceci indique le nombre de clients
+qui ont reçu le message.
 
 ## Monitor and Slow Log
 
