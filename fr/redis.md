@@ -1051,70 +1051,71 @@ The next chapter will talk about Redis administration and configuration in more 
 
 This chapter introduced Redis' Lua scripting capabilities. Like anything, this feature can be abused. However, used prudently in order to implement your own custom and focused commands, it won't only simplify your code, but will likely improve performance. Lua scripting is like almost every other Redis feature/command: you make limited, if any, use of it at first only to find yourself using it more and more every day. 
 
-# Chapter 6 - Administration
+# Chapitre 6 - Administration
 
-Our last chapter is dedicated to some of the administrative aspects of running Redis. In no way is this a comprehensive guide on Redis administration. At best we'll answer some of the more basic questions new users to Redis are most likely to have.
+Notre dernier chapitre est dédié à certains aspects de l'administration d'un serveur Redis. Ce n'est en aucun cas un manuel complet sur l'administration de Redis. Au mieux, nous répondrons à certaines de vos interrogations que la plupart des nouveaux utilisateurs de Redis se posent communément.
 
 ## Configuration
 
-When you first launched the Redis server, it warned you that the `redis.conf` file could not be found. This file can be used to configure various aspects of Redis. A well-documented `redis.conf` file is available for each release of Redis. The sample file contains the default configuration options, so it's useful to both understand what the settings do and what their defaults are. You can find it at <https://github.com/antirez/redis/raw/2.4.6/redis.conf>.
+Quand vous démarrez pour la première fois, le service Redis, il vous avertit que le fichier `redis.conf` est indisponible. Ce fichier permet de configurer différents paramètres de Redis. Un fichier `redis.conf` bien documenté est disponible avec chaque version de Redis. Ce fichier d'exemple contient les options de configuration par défaut, il est donc utile de comprendre à la fois ce que ces paramètres font et quelles sont les valeurs par défaut. Vous pourrez le trouver à l'url suivante: <https://github.com/antirez/redis/raw/2.4.6/redis.conf>.
 
-**This is the config file for Redis 2.4.6. You should replace "2.4.6" in the above URL with your version. You can find your version by running the `info` command and looking at the first value.**
+**Ceci est le fichier de configuration de Redis 2.4.6. Vous devrez remplacer le "2.4.6" dans l'url précédente avec le numéro de version correspondant. Vous pourrez retrouver le numéro de version en récupérant la première valeur retournée par la commande `info`.**
 
-Since the file is well-documented, we won't be going over the settings.
+Puisque le fichier est bien documenté, nous ne verrons pas le détails des paramètres.
 
-In addition to configuring Redis via the `redis.conf` file, the `config set` command can be used to set individual values. In fact, we already used it when setting the `slowlog-log-slower-than` setting to 0.
+En plus de pouvoir configurer Redis à l'aide du fichier `redis.conf`, la commande  `config set` peut être utilisé pour définir des valeurs individuelles. Nous nous sommes déjà servi de cette possibilité en définissant le paramètre `slowlog-log-slower-than` à 0.
 
-There's also the `config get` command which displays the value of a setting. This command supports pattern matching. So if we want to display everything related to logging, we can do:
+Il y a également la commande  `config get` qui affiche la valeur d'un paramètre. La commande supporte la correspondance par motif. Donc si nous souhaitons configurer l'ensemble des paramètres de logs, nous vouvons faire:
 
 	config get *log*
 
-## Authentication
+## Authentification
 
-Redis can be configured to require a password. This is done via the `requirepass` setting (set through either the `redis.conf` file or the `config set` command). When `requirepass` is set to a value (which is the password to use), clients will need to issue an `auth password` command.
+Redis peut être configurer pour requérir un mot de passe. Cela est possible en configurant `requirepass` (soit à l'aide du fichier `redis.conf` ou de la commande `config set`. Quant `requirepass` est défini (avec le mot de passe requis), les clients doivent s'authentifier à l'aide de la commande `auth password`.
 
-Once a client is authenticated, they can issue any command against any database. This includes the `flushall` command which erases every key from every database. Through the configuration, you can rename commands to achieve some security through obfuscation:
+Dès qu'un client est authentifié, il peut utiliser n'importe quelle commande sur toutes les bases. Cela inclut la commande `flushall` qui supprime toutes les clés de toutes les bases. À travers la configuration, vous pouvez renommer les commandes pour réaliser une sécurité par obscurité:
 
 	rename-command CONFIG 5ec4db169f9d4dddacbfb0c26ea7e5ef
 	rename-command FLUSHALL 1041285018a942a4922cbf76623b741e
 
-Or you can disable a command by setting the new name to an empty string.
+Ou bien désactiver la commande en redéfinissant son nom en chaîne vide.
 
-## Size Limitations
+## Limitations de taille
 
-As you start using Redis, you might wonder "how many keys can I have?" You might also wonder how many fields can a hash have (especially when you use it to organize your data), or how many elements can lists and sets have? Per instance, the practical limits for all of these is in the hundreds of millions.
+Dès que vous utilisez Redis, vous vous demander peut-être "Combien de clés puis-je avoir ?" Mais également, combien de champs peut avoir les tables de hachages (notamment quand vous les utiliser pour structurer vos données), ou bien combien d'élèments peuvent contenir les listes et les ensembles ? Les limites pratiques par instances sont pour chacunes d'environ plusieurs centaines de millions.
 
+## Réplication
 
-## Replication
+Redis offre le support de la réplication, ce qui signifie que dès que vous écrivez sur une instance Redis (maitre), une ou plusieurs instances (esclaves) sont automatiquement mises à jour par le maitre. Pour configurer un esclave, vous pouvez utiliser soit la clé de configuration `slaveof` ou la commande éponyme (les instances en cours sans cette clé configuré sont soient maitres ou peuvent l'être).
 
-Redis supports replication, which means that as you write to one Redis instance (the master), one or more other instances (the slaves) are kept up-to-date by the master. To configure a slave you use either the `slaveof` configuration setting or the `slaveof` command (instances running without this configuration are or can be masters).
+La réplication permet de protéger vos données en les copiant sur différents serveurs. La réplication peut servir à améliorer les performances puisque l'on peut répartir les lectures entre les esclaves. Ils peuvent répondre avec des données légèrement en retard, mais pour la plupart des applications, c'est un compromis acceptable.
 
-Replication helps protect your data by copying to different servers. Replication can also be used to improve performance since reads can be sent to slaves. They might respond with slightly out of date data, but for most apps that's a worthwhile tradeoff.
+Malheureusement, la réplication Redis n'offre pas encore de basculement automatique. Si le maitre tombe en panne, un esclave doit être promu manuellement. Les outils de haute disponibilité classique qui se base sur le monitoring et les scripts permettant le basculement sont un mal nécessaire si vous souhaitez obtenir de la haute disponibilité avec Redis.
 
-Unfortunately, Redis replication doesn't yet provide automated failover. If the master dies, a slave needs to be manually promoted. Traditional high-availability tools that use heartbeat monitoring and scripts to automate the switch are currently a necessary headache if you want to achieve some sort of high availability with Redis.
+## Sauvegarde
 
-## Backups
+Pour sauvegarder Redis, il suffit de copier un cliché de la base sur un support quelconque (S3, FTP, etc.). Par défaut, Redis sauvegarde son cliché dans un fichier nommé `dump.rdb`. VOus pouvez copier ce fichier à n'importe quel moment à l'aide de `scp`, `ftp` ou `cp` (ou autre).
 
-Backing up Redis is simply a matter of copying Redis' snapshot to whatever location you want (S3, FTP, ...). By default Redis saves its snapshot to a file named `dump.rdb`. At any point in time, you can simply `scp`, `ftp` or `cp` (or anything else) this file.
+Il n'est pas inhabituel de désactiver à la fois les clichés et le fichier en mode ajout sur le maitre et laisser un esclave gérer ceci. Cela permet de réduire la charge sur le maitre et vous permet de configurer des paramètres de sauvegarde plus aggressifs sur l'esclave sans nuire aux performances du système.
 
-It isn't uncommon to disable both snapshotting and the append-only file (aof) on the master and let a slave take care of this. This helps reduce the load on the master and lets you set more aggressive saving parameters on the slave without hurting overall system responsiveness.
+## Passage à l'échelle et Redis Cluster
 
-## Scaling and Redis Cluster
+La réplication est le premier outil qu'un site en croissance a à sa disposition. Certaines commandes sont plus coûteuses que d'autres (par ex. `sort`) et répartir leurs exécution sur un esclave peut aider à un système à conserver un temps de réponse correct pour traiter les requêtes entrantes.
 
-Replication is the first tool a growing site can leverage. Some commands are more expensive than others (`sort` for example) and offloading their execution to a slave can keep the overall system responsive to incoming queries.
+Au-delà, passer à l'échelle Redis revient à distribuer vos clés sur plusieurs instances Redis (qui peuvent tourner sur la même machine, souvenez-vous, Redis est mono-thread). Pour le meoment, c'est une problématique que vous devrait gérer (bien qu'un certain nombre de pilotes Redis fournissent des algorithmes de hachage cohérent). Penser vos données en termes de distribution horizontale, n'entre pas dans le scope de cet ouvrage. C'est également quelque chose dont vous n'aurez pas à vous soucier avant longtemps, mais vous devriez en prendre connaissance quelque soit la solution retenue.
 
-Beyond this, truly scaling Redis comes down to distributing your keys across multiple Redis instances (which could be running on the same box, remember, Redis is single-threaded). For the time being, this is something you'll need to take care of (although a number of Redis drivers do provide consistent-hashing algorithms). Thinking about your data in terms of horizontal distribution isn't something we can cover in this book. It's also something you probably won't have to worry about for a while, but it's something you'll need to be aware of regardless of what solution you use.
+La bonne nouvelle est que cette problématique est sensé être résolu par le prochain Redis Cluster. Non seulement, il offrira le passage à l'échelle horizontal (incluant la redistribution des données), mais ils fournira le basculement automatique pour la haute-disponibilité.
 
-The good news is that work is under way on Redis Cluster. Not only will this offer horizontal scaling, including rebalancing, but it'll also provide automated failover for high availability.
+La haute-disponibilité et le passage à l'échelle est quelque chose qui peut être réalisé très rapidement, du moment que vous êtes d'accord pour y cnsacrer du temps et quelques efforts. Plus tard, Redis Cluster devrait vous faciliter la vie.
 
-High availability and scaling is something that can be achieved today, as long as you are willing to put the time and effort into it. Moving forward, Redis Cluster should make things much easier.
+## Dans ce chapitre
 
-## In This Chapter
+Étant donné le nombre de projets et sites utilisant déjà Redis, il n'y a aucun doute sur le fait que Redis soit mature, et cela depuis un bon moment. Néanmoins, une partie de l'outillage notamment ceux associés à la sécurité et la haute-disponibilité sont encore jeunes. Nous espérons que la sortie prochaine de Redis Cluster devrait résoudre certaines de ces problématiques.
 
-Given the number of projects and sites using Redis already, there can be no doubt that Redis is production-ready, and has been for a while. However, some of the tooling, especially around security and availability is still young. Redis Cluster, which we'll hopefully see soon, should help address some of the current management challenges.
 
 # Conclusion
 
-In a lot of ways, Redis represents a simplification in the way we deal with data. It peels away much of the complexity and abstraction available in other systems. In many cases this makes Redis the wrong choice. In others it can feel like Redis was custom-built for your data.
+De bien des manières, Redis aide à simplifier la façon dont on traite les données. Il élimine une bonne part de complexité et d'abstraction disponibles dans d'autres systèmes. Dans certains cas, cela fait de Redis un mauvais choix. Dans d'autres, il donne l'impression que Redis est taillé sur mesure pour gérer nos données.
 
-Ultimately it comes back to something I said at the very start: Redis is easy to learn. There are many new technologies and it can be hard to figure out what's worth investing time into learning. When you consider the real benefits Redis has to offer with its simplicity, I sincerely believe that it's one of the best investments, in terms of learning, that you and your team can make.
+Au final, cela revient à ce que je disais au début: Redis est simple à apprendre. Il y a de nombreuses autres technologies, et il est difficile de se décider sur laquelle investir du temps pour les apprendre. Quand vous mettez en relation les avantages offerts par Redis et sa simplicité, je crois que c'est l'un des meilleurs investissements que vous puissiez vous et votre équipe réaliser.
+
