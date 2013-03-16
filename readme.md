@@ -44,7 +44,7 @@ Vous devriez aussi avec les polices Microsfts installées. Vous pouvez cependant
 
 #### Construction
 
-Exécutez `make en/redis.pdf`.
+Exécutez `make fr/redis.pdf`.
 
 ### ePub
 
@@ -56,7 +56,7 @@ Paquets:
 
 #### Construction
 
-Exécutez `make en/redis.epub`.
+Exécutez `make fr/redis.epub`.
 
 ### Mobi
 
@@ -70,7 +70,7 @@ Vous devez aussi avoir [KindleGen](http://www.amazon.com/gp/feature.html?ie=UTF8
 
 #### Construction
 
-Lancez `make en/redis.mobi`.
+Lancez `make fr/redis.mobi`.
 
 ## Image de titre ##
 Un PSD de l'image de titre est inclus. La police utilisée est [Comfortaa](http://www.dafont.com/comfortaa.font).
