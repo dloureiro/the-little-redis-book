@@ -782,52 +782,72 @@ imaginé dans un premier temps.
 
 # Chapter 4 - Beyond The Data Structures
 
-While the five data structures form the foundation of Redis, there are other commands which aren't data structure specific. We've already seen a handful of these: `info`, `select`, `flushdb`, `multi`, `exec`, `discard`, `watch` and `keys`. This chapter will look at some of the other important ones.
+While the five data structures form the foundation of Redis, there are other commands which aren't data structure
+specific. We've already seen a handful of these: `info`, `select`, `flushdb`, `multi`, `exec`, `discard`, `watch` and
+`keys`. This chapter will look at some of the other important ones.
 
 ## Expiration
 
-Redis allows you to mark a key for expiration. You can give it an absolute time in the form of a Unix timestamp (seconds since January 1, 1970) or a time to live in seconds. This is a key-based command, so it doesn't matter what type of data structure the key represents.
+Redis allows you to mark a key for expiration. You can give it an absolute time in the form of a Unix timestamp
+(seconds since January 1, 1970) or a time to live in seconds. This is a key-based command, so it doesn't matter what
+type of data structure the key represents.
 
 	expire pages:about 30
 	expireat pages:about 1356933600
 
-The first command will delete the key (and associated value) after 30 seconds. The second will do the same at 12:00 a.m. December 31st, 2012.
+The first command will delete the key (and associated value) after 30 seconds. The second will do the same at 12:00
+a.m. December 31st, 2012.
 
-This makes Redis an ideal caching engine. You can find out how long an item has to live until via the `ttl` command and you can remove the expiration on a key via the `persist` command:
+This makes Redis an ideal caching engine. You can find out how long an item has to live until via the `ttl` command
+and you can remove the expiration on a key via the `persist` command:
 
 	ttl pages:about
 	persist pages:about
 
-Finally, there's a special string command, `setex` which lets you set a string and specify a time to live in a single atomic command (this is more for convenience than anything else):
+Finally, there's a special string command, `setex` which lets you set a string and specify a time to live in a single
+atomic command (this is more for convenience than anything else):
 
 	setex pages:about 30 '<h1>about us</h1>....'
 
 ## Publication and Subscriptions
 
-Redis lists have an `blpop` and `brpop` command which returns and removes the first (or last) element from the list or blocks until one is available. These can be used to power a simple queue.
+Redis lists have an `blpop` and `brpop` command which returns and removes the first (or last) element from the list or
+blocks until one is available. These can be used to power a simple queue.
 
-Beyond this, Redis has first-class support for publishing messages and subscribing to channels. You can try this out yourself by opening a second `redis-cli` window. In the first window subscribe to a channel (we'll call it `warnings`):
+Beyond this, Redis has first-class support for publishing messages and subscribing to channels. You can try this out
+yourself by opening a second `redis-cli` window. In the first window subscribe to a channel (we'll call it `warnings`):
 
 	subscribe warnings
 
-The reply is the information of your subscription. Now, in the other window, publish a message to the `warnings` channel:
+The reply is the information of your subscription. Now, in the other window, publish a message to the `warnings`
+channel:
 
 	publish warnings "it's over 9000!"
 
 If you go back to your first window you should have received the message to the `warnings` channel.
 
-You can subscribe to multiple channels (`subscribe channel1 channel2 ...`), subscribe to a pattern of channels (`psubscribe warnings:*`) and use the `unsubscribe` and `punsubscribe` commands to stop listening to one or more channels, or a channel pattern.
+You can subscribe to multiple channels (`subscribe channel1 channel2 ...`), subscribe to a pattern of channels
+(`psubscribe warnings:*`) and use the `unsubscribe` and `punsubscribe` commands to stop listening to one or more
+channels, or a channel pattern.
 
-Finally, notice that the `publish` command returned the value 1. This indicates the number of clients that received the message.
+Finally, notice that the `publish` command returned the value 1. This indicates the number of clients that received the
+message.
 
 
 ## Monitor and Slow Log
 
-The `monitor` command lets you see what Redis is up to. It's a great debugging tool that gives you insight into how your application is interacting with Redis. In one of your two redis-cli windows (if one is still subscribed, you can either use the `unsubscribe` command or close the window down and re-open a new one) enter the `monitor` command. In the other, execute any other type of command (like `get` or `set`). You should see those commands, along with their parameters, in the first window.
+The `monitor` command lets you see what Redis is up to. It's a great debugging tool that gives you insight into how
+your application is interacting with Redis. In one of your two redis-cli windows (if one is still subscribed, you can
+either use the `unsubscribe` command or close the window down and re-open a new one) enter the `monitor` command. In
+the other, execute any other type of command (like `get` or `set`). You should see those commands, along with their
+parameters, in the first window.
 
-You should be wary of running monitor in production, it really is a debugging and development tool. Aside from that, there isn't much more to say about it. It's just a really useful tool.
+You should be wary of running monitor in production, it really is a debugging and development tool. Aside from that,
+there isn't much more to say about it. It's just a really useful tool.
 
-Along with `monitor`, Redis has a `slowlog` which acts as a great profiling tool. It logs any command which takes longer than a specified number of **micro**seconds. In the next section we'll briefly cover how to configure Redis, for now you can configure Redis to log all commands by entering:
+Along with `monitor`, Redis has a `slowlog` which acts as a great profiling tool. It logs any command which takes
+longer than a specified number of **micro**seconds. In the next section we'll briefly cover how to configure Redis, for
+now you can configure Redis to log all commands by entering:
 
 	config set slowlog-log-slower-than 0
 
@@ -848,11 +868,13 @@ For each command you entered you should see four parameters:
 
 * The command and its parameters
 
-The slow log is maintained in memory, so running it in production, even with a low threshold, shouldn't be a problem. By default it will track the last 1024 logs.
+The slow log is maintained in memory, so running it in production, even with a low threshold, shouldn't be a problem.
+By default it will track the last 1024 logs.
 
 ## Sort
 
-One of Redis' most powerful commands is `sort`. It lets you sort the values within a list, set or sorted set (sorted sets are ordered by score, not the members within the set). In its simplest form, it allows us to do:
+One of Redis' most powerful commands is `sort`. It lets you sort the values within a list, set or sorted set (sorted
+sets are ordered by score, not the members within the set). In its simplest form, it allows us to do:
 
 	rpush users:leto:guesses 5 9 10 2 4 10 19 2
 	sort users:leto:guesses
@@ -862,13 +884,19 @@ Which will return the values sorted from lowest to highest. Here's a more advanc
 	sadd friends:ghanima leto paul chani jessica alia duncan
 	sort friends:ghanima limit 0 3 desc alpha
 
-The above command shows us how to page the sorted records (via `limit`), how to return the results in descending order (via `desc`) and how to sort lexicographically instead of numerically (via `alpha`).
+The above command shows us how to page the sorted records (via `limit`), how to return the results in descending order
+(via `desc`) and how to sort lexicographically instead of numerically (via `alpha`).
 
-The real power of `sort` is its ability to sort based on a referenced object. Earlier we showed how lists, sets and sorted sets are often used to reference other Redis objects. The `sort` command can dereference those relations and sort by the underlying value. For example, say we have a bug tracker which lets users watch issues. We might use a set to track the issues being watched:
+The real power of `sort` is its ability to sort based on a referenced object. Earlier we showed how lists, sets and
+sorted sets are often used to reference other Redis objects. The `sort` command can dereference those relations and
+sort by the underlying value. For example, say we have a bug tracker which lets users watch issues. We might use a set
+to track the issues being watched:
 
 	sadd watch:leto 12339 1382 338 9338
 
-It might make perfect sense to sort these by id (which the default sort will do), but we'd also like to have these sorted by severity. To do so, we tell Redis what pattern to sort by. First, let's add some more data so we can actually see a meaningful result:
+It might make perfect sense to sort these by id (which the default sort will do), but we'd also like to have these
+sorted by severity. To do so, we tell Redis what pattern to sort by. First, let's add some more data so we can actually
+see a meaningful result:
 
 	set severity:12339 3
 	set severity:1382 2
@@ -879,9 +907,11 @@ To sort the bugs by severity, from highest to lowest, you'd do:
 
 	sort watch:leto by severity:* desc
 
-Redis will substitute the `*` in our pattern (identified via `by`) with the values in our list/set/sorted set. This will create the key name that Redis will query for the actual values to sort by.
+Redis will substitute the `*` in our pattern (identified via `by`) with the values in our list/set/sorted set. This
+will create the key name that Redis will query for the actual values to sort by.
 
-Although you can have millions of keys within Redis, I think the above can get a little messy. Thankfully `sort` can also work on hashes and their fields. Instead of having a bunch of top-level keys you can leverage hashes:
+Although you can have millions of keys within Redis, I think the above can get a little messy. Thankfully `sort` can
+also work on hashes and their fields. Instead of having a bunch of top-level keys you can leverage hashes:
 
 	hset bug:12339 severity 3
 	hset bug:12339 priority 1
@@ -899,11 +929,14 @@ Although you can have millions of keys within Redis, I think the above can get a
 	hset bug:9338 priority 2
 	hset bug:9338 details "{id: 9338, ....}"
 
-Not only is everything better organized, and we can sort by `severity` or `priority`, but we can also tell `sort` what field to retrieve:
+Not only is everything better organized, and we can sort by `severity` or `priority`, but we can also tell `sort` what
+field to retrieve:
 
 	sort watch:leto by bug:*->priority get bug:*->details
 
-The same value substitution occurs, but Redis also recognizes the `->` sequence and uses it to look into the specified field of our hash. We've also included the `get` parameter, which also does the substitution and field lookup, to retrieve bug details.
+The same value substitution occurs, but Redis also recognizes the `->` sequence and uses it to look into the specified
+field of our hash. We've also included the `get` parameter, which also does the substitution and field lookup, to
+retrieve bug details.
 
 Over large sets, `sort` can be slow. The good news is that the output of a `sort` can be stored:
 
@@ -913,7 +946,10 @@ Combining the `store` capabilities of `sort` with the expiration commands we've 
 
 ## In This Chapter
 
-This chapter focused on non-data structure-specific commands. Like everything else, their use is situational. It isn't uncommon to build an app or feature that won't make use of expiration, publication/subscription and/or sorting. But it's good to know that they are there. Also, we only touched on some of the commands. There are more, and once you've digested the material in this book it's worth going through the [full list](http://redis.io/commands).
+This chapter focused on non-data structure-specific commands. Like everything else, their use is situational. It isn't
+uncommon to build an app or feature that won't make use of expiration, publication/subscription and/or sorting. But
+it's good to know that they are there. Also, we only touched on some of the commands. There are more, and once you've
+digested the material in this book it's worth going through the [full list](http://redis.io/commands).
 
 # Chapter 5 - Lua Scripting
 
