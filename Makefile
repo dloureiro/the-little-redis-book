@@ -5,11 +5,13 @@ PDF_BUILDER = pandoc
 PDF_BUILDER_FLAGS = \
 	--latex-engine xelatex \
 	--template ../common/pdf-template.tex \
-	--listings
+	--listings \
+	--toc
 
 EPUB_BUILDER = pandoc
 EPUB_BUILDER_FLAGS = \
-	--epub-cover-image
+	--toc \
+	--epub-cover-image \
 
 MOBI_BUILDER = kindlegen
 
