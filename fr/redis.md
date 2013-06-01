@@ -8,7 +8,7 @@ payé pour l'obtenir.
 Vous êtes libres de copier, distribuer, modifier ou afficher ce livre. Cependant, je demande à ce que vous attribuiez
 toujours ce livre à mon, Karl Seguin, et que vous ne l'utilisiez pas dans un but commercial.
 
-Vous pouvez accéder au *texte complet* de **la licence à l'adresse**: 
+Vous pouvez accéder au *texte complet* de **la licence à l'adresse**:
 
 <http://creativecommons.org/licenses/by-nc/3.0/legalcode>
 
@@ -780,7 +780,7 @@ construire toute sorte de choses, mais la vraie clée est la compréhension des 
 d'obtenir une idée sur la manière dont elles peuvent être utilisées pour réaliser des choses que nous n'auriez pas
 imaginé dans un premier temps.
 
-# Chapter 4 - Beyond The Data Structures
+# Chapitre 4 - Au-delà des structures de données
 
 Tandis que les cinq structures de données de Redis en forme les fondations, il y a un certain nombre d'autres
 commandes qui ne sont pas liées spécifiquement à une structure de données spécifique. Nous en avons déjà vu un nombre
@@ -838,58 +838,48 @@ souscrire à un pattern de channel (`psubscribe warnings:*`) et enfin utiliser l
 Enfin, il est important de noter que la commande `publish` retourne la valeur 1. Ceci indique le nombre de clients
 qui ont reçu le message.
 
-## Monitor and Slow Log
+## Commandes monitor et slowlog
 
-The `monitor` command lets you see what Redis is up to. It's a great debugging tool that gives you insight into how
-your application is interacting with Redis. In one of your two redis-cli windows (if one is still subscribed, you can
-either use the `unsubscribe` command or close the window down and re-open a new one) enter the `monitor` command. In
-the other, execute any other type of command (like `get` or `set`). You should see those commands, along with their
-parameters, in the first window.
+La commande `monitor` vous laisse observer de quoi est capable Redis. Il s'agit d'une outil de débuggage fantastique qui vous permet d'avoir une vision sur la façon dont votre application interagit avec Redis.
 
-You should be wary of running monitor in production, it really is a debugging and development tool. Aside from that,
-there isn't much more to say about it. It's just a really useful tool.
+Dans l'une de vos deux fenêtres avec la cli de Redis (si l'une d'entre elles est toujours inscrite, vous pouvez soit utiliser la commande `unsubscribe` soit fermer la fenêtre et en réouvrir une nouvelle) entrez la commande `monitor`. Dans l'autre fenêtre, exécutez n'importe quel autre type de commande (comme `get` ou `set`). Vous devriez voir ces commandes, ainsi que leurs paramètres, dans la première fenêtre.
 
-Along with `monitor`, Redis has a `slowlog` which acts as a great profiling tool. It logs any command which takes
-longer than a specified number of **micro**seconds. In the next section we'll briefly cover how to configure Redis, for
-now you can configure Redis to log all commands by entering:
+Vous devriez être prudent en exécutant la commande `monitor` en production, il s'agit vraiment d'un outil de debugging et de développement. En dehors de ça, il n'y a pas grand choses à dire à son propos. Il s'agit d'un outil réellement utile.
+
+À côté de la commande `monitor`, Redis dispose d'une commande nommée `slowlog` qui peut agir comme un excellent outil de profiling. Il loggue toute commande durant plus d'un certain nombre de **micro**secondes. Dans la prochaine section, nous allons brièvement couvrir la manière de configurer Redis, mais pour l'instant nous allons configurer Redis pour que toutes les commandes soient logguées en entrant :
 
 	config set slowlog-log-slower-than 0
 
-Next, issue a few commands. Finally you can retrieve all of the logs, or the most recent logs via:
+Ensuite, entrez quelques commandes. Vous pouvez ensuite récupérer toutes les logs ou seulement les plus récentes de la manière suivante :
 
 	slowlog get
 	slowlog get 10
 
-You can also get the number of items in the slow log by entering `slowlog len`
+Vous pouvez aussi récupérer le nombre d'éléments dans les *slow log* en entrant `slowlog len`
 
-For each command you entered you should see four parameters:
+Pour chaque commande que vous avez entré, vous devriez voir quatre paramètres :
 
-* An auto-incrementing id
+ * Un id auto-incrémenté
+ * Un timestamp Unix correspondant au moment où elle a été exécutée
+ * La durée, en microsecondes, que la commande a pris pour s'exécuter
+ * La commande et ses paramètres
 
-* A Unix timestamp for when the command happened
+Les *slow log* sont maintenues en mémoire, ainsi, exécuter cette commande en production, même avec un seuil bas, ne devrait pas poser de problèmes. Par défaut, la commande suivra les 1024 derniers logs.
 
-* The time, in microseconds, it took to run the command
+## Commande `sort`
 
-* The command and its parameters
-
-The slow log is maintained in memory, so running it in production, even with a low threshold, shouldn't be a problem.
-By default it will track the last 1024 logs.
-
-## Sort
-
-One of Redis' most powerful commands is `sort`. It lets you sort the values within a list, set or sorted set (sorted
-sets are ordered by score, not the members within the set). In its simplest form, it allows us to do:
+La commande `sort`est l'une des plus puissantes de Redis. Elle vous permet de trier des valeurs au sein d'une liste, d'un ensemble ou d'un ensemble trié (ces ensembles sont triés par score et non en fonction des membres au sein de cet ensemble). Dans sa forme la plus simple, elle nous permet de réaliser l'opération suivante :
 
 	rpush users:leto:guesses 5 9 10 2 4 10 19 2
 	sort users:leto:guesses
 
-Which will return the values sorted from lowest to highest. Here's a more advanced example:
+qui retournera les valeurs triées de manière ascendante. Voici un exemple plus avancé :
 
 	sadd friends:ghanima leto paul chani jessica alia duncan
 	sort friends:ghanima limit 0 3 desc alpha
 
-The above command shows us how to page the sorted records (via `limit`), how to return the results in descending order
-(via `desc`) and how to sort lexicographically instead of numerically (via `alpha`).
+La commande ci-dessus nous montre comment paginer les entrées triées (via `limit`), comment retourner les résultats en ordre descendant
+(via `desc`) et comment les trier de manière lexicographique et non numérique (via `alpha`).
 
 The real power of `sort` is its ability to sort based on a referenced object. Earlier we showed how lists, sets and
 sorted sets are often used to reference other Redis objects. The `sort` command can dereference those relations and
