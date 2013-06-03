@@ -932,13 +932,13 @@ Ainsi, en combinant les capacités de `store` et de `sort` avec les commandes d'
 
 Ce chapitre s'est concentré sur les commandes non spécifiques aux structures de données. Comme tout le reste leur usage est circonstanciel . Ce n'est pas rare de construire une application ou une fonctionnalité qui ne fasse pas usage de l'expiration, des mécanismes de publication/souscription ou des tris. Mais il est bon de les connaître et de savoir qu'elles existent. De plus, nous n'avons fait qu'aborder certaines des commandes disponibles. Il y en a d'autres, et une fois que vous aurez digéré le contenu de ce livre, il est intéressant de parcourir la [liste complète](http://redis.io/commands).
 
-# Chapter 5 - Lua Scripting
+# Chapitre 5 - Scripting en Lua
 
-Redis 2.6 includes a built-in Lua interpreter which developers can leverage to write more advanced queries to be executed within Redis. It wouldn't be wrong of you to think of this capability much like you might view stored procedures available in most relational databases.
+Redis 2.6 intègre un interpréteur Lua que les développeurs peuvent utiliser pour écrire des requêtes plus avancées qui pourront être exécutées par Redis. Il ne serait pas faux de voir cette capacité comme une manière de disposer des procédures stockées disponibles pour les bases de données relationnelles.
 
-The most difficult aspect of mastering this feature is learning Lua. Thankfully, Lua is similar to most general purpose languages, is well documented, has an active community and is useful to know beyond Redis scripting. This chapter won't cover Lua in any detail; but the few examples we look at should hopefully serve as a simple introduction.
+L'aspect le plus contraignant avec cette fonctionnalité est de devoir apprendre Lua. Heureusement, Lua est très proche de la plupart des langages classiques, est très bien documenté, possède une communauté active et est utile en dehors du scripting avec Redis. Ce chapitre ne convrira pas Lua en détail; mais les quelques exemples que nous aborderons pourront, je l'espère, servir d'introduction rapide.
 
-## Why?
+## Pourquoi ?
 
 Before looking at how to use Lua scripting, you might be wondering why you'd want to use it. Many developers dislike traditional stored procedures, is this any different? The short answer is no. Improperly used, Redis' Lua scripting can result in harder to test code, business logic tightly coupled with data access or even duplicated logic.
 
