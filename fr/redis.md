@@ -881,31 +881,24 @@ qui retournera les valeurs triées de manière ascendante. Voici un exemple plus
 La commande ci-dessus nous montre comment paginer les entrées triées (via `limit`), comment retourner les résultats en ordre descendant
 (via `desc`) et comment les trier de manière lexicographique et non numérique (via `alpha`).
 
-The real power of `sort` is its ability to sort based on a referenced object. Earlier we showed how lists, sets and
-sorted sets are often used to reference other Redis objects. The `sort` command can dereference those relations and
-sort by the underlying value. For example, say we have a bug tracker which lets users watch issues. We might use a set
-to track the issues being watched:
+Le vrai pouvoir de la commande `sort` réside dans sa capacité à trier en se basant sur un objet de référence. Nous avons pu montrer un peu plus tôt comment les listes, les ensemblent, ainsi que les ensembles triés sont souvent utilisés pour référencer d'autres objets Redis. La commande `sort` peut déréferencer ces relations et trier en fonction des valeurs sous-jacentes. Disons, par exemple, que nous avons un bug tracker qui permet aux utilisateurs de suivre les problèmes. Nous pourrions utiliser un ensemble pour traquer les problèmes suivi actuellement :
 
 	sadd watch:leto 12339 1382 338 9338
 
-It might make perfect sense to sort these by id (which the default sort will do), but we'd also like to have these
-sorted by severity. To do so, we tell Redis what pattern to sort by. First, let's add some more data so we can actually
-see a meaningful result:
+Cela pourrait complètement faire sens de trier ces problèmes en fonction de leurs ids (ce que le tri par défaut réalise), mais nous pourrions aussi vouloir les trier par sévérité. Pour réaliser cette tâche, nous pouvons dire à Redis quel pattern doit être utilisé pour le tri. Tout d'abord, ajoutons des valeurs supplémentaires afin d'obtenir des résultats qui aient du sens :
 
 	set severity:12339 3
 	set severity:1382 2
 	set severity:338 5
 	set severity:9338 4
 
-To sort the bugs by severity, from highest to lowest, you'd do:
+Pour trier les bugs par sévérité, de la plus haute à la plus basse, vous devez donc faire :
 
 	sort watch:leto by severity:* desc
 
-Redis will substitute the `*` in our pattern (identified via `by`) with the values in our list/set/sorted set. This
-will create the key name that Redis will query for the actual values to sort by.
+Redis substituera l'étoile `*` dans notre pattern (identifié via `by`) par la valeur dans notre liste/ensemble/ensemble trié. Cela créera la clée qui sera utilisée par Redis pour réalier sa requête avec les réelles valeurs dans son tri.
 
-Although you can have millions of keys within Redis, I think the above can get a little messy. Thankfully `sort` can
-also work on hashes and their fields. Instead of having a bunch of top-level keys you can leverage hashes:
+Bien que vous puissiez avoir plusieurs millions de clées dans Redis, je pense que ce qui a été énoncé ci-dessus peut-être un peu confus. Heureusement `sort` peut aussi fonctionner sur les hash et leurs champs. Au lieu d'avoir un ensemble de clées de niveau 1, vous pouvez vous services des hashes :
 
 	hset bug:12339 severity 3
 	hset bug:12339 priority 1
@@ -923,27 +916,21 @@ also work on hashes and their fields. Instead of having a bunch of top-level key
 	hset bug:9338 priority 2
 	hset bug:9338 details "{id: 9338, ....}"
 
-Not only is everything better organized, and we can sort by `severity` or `priority`, but we can also tell `sort` what
-field to retrieve:
+Non seulement tout est mieux organisé, vous pouvez trier par `severity` ou `priority`, mais vous pouvez aussi dire à `sort` quel champs doit être récupéré :
 
 	sort watch:leto by bug:*->priority get bug:*->details
 
-The same value substitution occurs, but Redis also recognizes the `->` sequence and uses it to look into the specified
-field of our hash. We've also included the `get` parameter, which also does the substitution and field lookup, to
-retrieve bug details.
+La même substitution de valeur est réalisée, mais Redis reconnaît aussi la flèche `->` et l'utiliser pour récupérer le champs en question au sein de votre hash. Nous avons aussi inclu le paramètre  `get`, qui réalise aussi une substitution and la recherche de champs afin de récupérer les détails des bugs.
 
-Over large sets, `sort` can be slow. The good news is that the output of a `sort` can be stored:
+Sur de grands ensembles, `sort` peut être lente. La bonne nouvelle est que la sortie peut être stockée :
 
 	sort watch:leto by bug:*->priority get bug:*->details store watch_by_priority:leto
 
-Combining the `store` capabilities of `sort` with the expiration commands we've already seen makes for a nice combo.
+Ainsi, en combinant les capacités de `store` et de `sort` avec les commandes d'expiration que nous avons déjà vu, nous pouvons avoir des résultats plutôt intéressants.
 
-## In This Chapter
+## Dans ce chapitre
 
-This chapter focused on non-data structure-specific commands. Like everything else, their use is situational. It isn't
-uncommon to build an app or feature that won't make use of expiration, publication/subscription and/or sorting. But
-it's good to know that they are there. Also, we only touched on some of the commands. There are more, and once you've
-digested the material in this book it's worth going through the [full list](http://redis.io/commands).
+Ce chapitre s'est concentré sur les commandes non spécifiques aux structures de données. Comme tout le reste leur usage est circonstanciel . Ce n'est pas rare de construire une application ou une fonctionnalité qui ne fasse pas usage de l'expiration, des mécanismes de publication/souscription ou des tris. Mais il est bon de les connaître et de savoir qu'elles existent. De plus, nous n'avons fait qu'aborder certaines des commandes disponibles. Il y en a d'autres, et une fois que vous aurez digéré le contenu de ce livre, il est intéressant de parcourir la [liste complète](http://redis.io/commands).
 
 # Chapter 5 - Lua Scripting
 
