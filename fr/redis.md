@@ -940,15 +940,15 @@ L'aspect le plus contraignant avec cette fonctionnalité est de devoir apprendre
 
 ## Pourquoi ?
 
-Before looking at how to use Lua scripting, you might be wondering why you'd want to use it. Many developers dislike traditional stored procedures, is this any different? The short answer is no. Improperly used, Redis' Lua scripting can result in harder to test code, business logic tightly coupled with data access or even duplicated logic.
+Avant de regarder de quelle manière utiliser le scripting en Lua, vous pourriez vous demander pourquoi vous souhaiteriez l'utiliser. Un certain nombre de développeurs n'aime pas les procédures stockées traditionelles, est ce que ceci est différent ? La réponse courte est non. Mal utilisé, le scripting en Lua de Redis peut aboutir à un code plus difficile à tester, à une logique business grandement couplée avec les données voire même une logique qui sera dupliquée.
 
-Properly used however, it's a feature that can simplify code and improve performance. Both of these benefits are largely achieved by grouping multiple commands, along with some simple logic, into a custom-build cohesive function. Code is made simpler because each invocation of a Lua script is run without interruption and thus provides a clean way to create your own atomic commands (essentially eliminating the need to use the cumbersome `watch` command). It can improve performance by removing the need to return intermediary results - the final output can be calculated within the script.
+Correctement utilisé par contre, il s'agit d'une fonctionnalité qui peut simplifier le code et améliorer les performances. Chacun de ces bénéfices sont largement atteints grâce au rassemblement de plusieurs commande, à côté d'une logique simple, au sein d'un fonction ad hoc cohérente. Le code est rendu plus simple car chaque invocation à un script Lua est exécuté sans interruption et fourni ainsi une méthode simple et claire pour créer ses propres commandes atomiques (ce qui élimine notamment l'usage de la commande `watch`, un peu emcombrante il faut l'avouer). Ceci peut améliorer la performance en supprimant le besoin de retourner des résultats intermédiares - le résultat final pouvant être calculé au sein du script.
 
-The examples in the following sections will better illustrate these points.
+Les exemples des sections suivantes illustreront mieux ces points.
 
 ## Eval
 
-The `eval` command takes a Lua script (as a string), the keys we'll be operating against, and an optional set of arbitrary arguments. Let's look at a simple example (executed from Ruby, since running multi-line Redis commands from its command-line tool isn't fun):
+La commande `eval` prend un script Lua en entrée (as a string), the keys we'll be operating against, and an optional set of arbitrary arguments. Let's look at a simple example (executed from Ruby, since running multi-line Redis commands from its command-line tool isn't fun):
 
     script = <<-eos
       local friend_names = redis.call('smembers', KEYS[1])
