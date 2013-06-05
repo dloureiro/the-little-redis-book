@@ -993,15 +993,15 @@ Les autres commandes `script kill`, `script flush` et `script exists` vous perme
 
 ## Bibliothèques
 
-Redis' Lua implementation ships with a handful of useful libraries. While `table.lib`, `string.lib` and `math.lib` are quite useful, for me, `cjson.lib` is worth singling out. First, if you find yourself having to pass multiple arguments to a script, it might be cleaner to pass it as JSON:
+L'implémentation de Lua livré avec Redis dispose d'une certain nombre de bibliothèques très utiles. Alors que `table.lib`, `string.lib` et `math.lib` sont très utiles, pour moi, `cjson.lib` sort tout particulièrement du lot. Tout d'abord, si vous retrouvez à devoir passer plusieurs arguments à un script, il peut être plus pratique et propre de passer ces éléments au format JSON :
 
     redis.evalsha ".....", [KEY1], [JSON.fast_generate({gender: 'm', ghola: true})]
 
-Which you could then deserialize within the Lua script as:
+Qui peuvent ensuite être désérialisés au sein du script en Lua de la manière suivante :
 
     local arguments = cjson.decode(ARGV[1])
 
-Of course, the JSON library can also be used to parse values stored in Redis itself. Our above example could potentially be rewritten as such:
+La bibliothèque JSON peut bien sûre être utilisée pour parser les valeurs stockées dans Redis lui-même. Notre exemple ci-dessus pourrait d'ailleurs être réécrit de la manière suivante :
 
       local friend_names = redis.call('smembers', KEYS[1])
       local friends = {}
@@ -1014,19 +1014,19 @@ Of course, the JSON library can also be used to parse values stored in Redis its
       end
       return friends
 
-Instead of getting the gender from specific hash field, we could get it from the stored friend data itself. (This is a much slower solution, and I personally prefer the original, but it does show what's possible).
+Au lieu de récupérer le genre d'un champ spécifique d'un hash, nous pourrions le récupérer des données de l'ami stocké (C'est une solution bien plus lente, et je préfère personnellement la solution originale, mais celle-ci permet de montrer ce qu'il est possible de faire).
 
-## Atomic
+## Atomicité
 
-Since Redis is single-threaded, you don't have to worry about your Lua script being interrupted by another Redis command. One of the most obvious benefits of this is that keys with a TTL won't expire half-way through execution. If a key is present at the start of the script, it'll be present at any point thereafter - unless you delete it.
+Dans la mesure ou Redis est mono-processus, vous n'avez pas à vous préoccuper du fait que votre script Lua soit interrompu par une autre commande Redis. L'un des bénéfices les plus évident est que les clées avec un TTL n'expirerons pas à mi-chemin de l'exécution du script. Si une clée est présente au début du script, elle sera présente en tout point de celui-ci, sauf si vous la supprimez.
 
 ## Administration
 
-The next chapter will talk about Redis administration and configuration in more detail. For now, simply know that the `lua-time-limit` defines how long a Lua script is allowed to execute before being terminated. The default is generous 5 seconds. Consider lowering it.
+Le prochain chapitre parlera plus en détail de l'administration de Redis et de sa configuration. Pour l'instant il est suffisant de savoir que `lua-time-limit` défini le temps qu'un script écrit en Lua peut prendre pour s'exécuter avant d'être arrêté. La valeur par défaut de 5 secondes est plutôt généreuse. Il vous est conseillé de la diminuer.
 
-## In This Chapter
+## Dans ce chapitre
 
-This chapter introduced Redis' Lua scripting capabilities. Like anything, this feature can be abused. However, used prudently in order to implement your own custom and focused commands, it won't only simplify your code, but will likely improve performance. Lua scripting is like almost every other Redis feature/command: you make limited, if any, use of it at first only to find yourself using it more and more every day. 
+Ce chapitre a introduit les capacités de scripting en Lua de Redis. Tout comme n'importe quelle fonctionnalité, elle peut être utilisé avec abus. Cependant, utilisée prudemment afin d'implémenter vos propres commandes, elle vous permettra non selement de simplifier votre code, mais aussi d'améliorer la performance. Le scripting en Lua est comme n'importe quelle autre commande/fonctionnalité de Redis: vous en faites un éventuel usage, limité au départ, seulement pour vous retrouver à l'utliser de plus en plus chaque jour. 
 
 # Chapitre 6 - Administration
 
