@@ -948,7 +948,7 @@ Les exemples des sections suivantes illustreront mieux ces points.
 
 ## Eval
 
-La commande `eval` prend un script Lua en entrée (as a string), the keys we'll be operating against, and an optional set of arbitrary arguments. Let's look at a simple example (executed from Ruby, since running multi-line Redis commands from its command-line tool isn't fun):
+La commande `eval` prend un script Lua en entrée (en tant que chaîne de caractères), les clées sur lesquelles le script va opérer, et un ensemble optionnel d'arguments arbitraires. Regardons un exemple simple (cet exemple est écrit en Ruby, dans la mesure où des commandes Redis sur plusieurs lignes ne sont pas très fun à exécuter depuis la ligne de commande):
 
     script = <<-eos
       local friend_names = redis.call('smembers', KEYS[1])
@@ -964,34 +964,34 @@ La commande `eval` prend un script Lua en entrée (as a string), the keys we'll 
     eos
     Redis.new.eval(script, ['friends:leto'], ['m'])
 
-The above code gets the details for all of Leto's male friends. Notice that to call Redis commands within our script we use the `redis.call("command", ARG1, ARG2, ...)` method.
+Le code ci-dessus récupère les détails de tous les amis masculins de Leto. Il faut noter que pour réaliser les commandes vers Redis au sein de notre script, nous utilisons la méthode `redis.call("command", ARG1, ARG2, ...)` method.
 
-If you are new to Lua, you should go over each line carefully. It might be useful to know that `{}` creates an empty `table` (which can act as either an array or a dictionary), `#TABLE` gets the number of elements in the TABLE, and `..` is used to concatenate strings.
+Si vous n'êtes pas famillier avec Luad, vous devriez étudier avec soin chaque ligne de ce script. Il est par exemple utile de savoir que `{}` créé une `table` vide (qui peut correspondre à un tableau ou un dictionnaire), `#TABLE` récupère le nombre d'éléments dans ,  et `..` sert à la concaténation de chaînes.
 
-`eval` actually take 4 parameters. The second parameter should actually be the number of keys; however the Ruby driver automatically creates this for us. Why is this needed? Consider how the above looks like when executed from the CLI:
-  
+La commande `eval` prend effectivement quatres paramètres. Le second paramètre doit être le nombre de clées; cependant le driver Ruby de Redis rempli pour nous la valeur de manière automatique. Pourquoi est-ce nécessaire? Considérez par exemple la manière dont ceci est exécuté depuis la ligne de commande :
+
     eval "....." "friends:leto" "m"
     vs
     eval "....." 1 "friends:leto" "m"
 
-In the first (incorrect) case, how does Redis know which of the parameters are keys and which are simply arbitrary arguments? In the second case, there is no ambiguity.
+Dans le premier ca (incorrect), comment Redis peut-il savoir quel est le paramètre correspondant au nombre de clées et qu'est ce qui correspond aux paramètres arbitraires ? Dans le second cas, il n'y a pas d'ambiguités.
 
-This brings up a second question: why must keys be explicitly listed? Every command in Redis knows, at execution time, which keys are going to needed. This will allow future tools, like Redis Cluster, to  distribute requests amongst multiple Redis servers. You might have spotted that our above example actually reads from keys dynamically (without having them passed to `eval`). An `hget` is issued on all of Leto's male friends. That's because the need to list keys ahead of time is more of a suggestion than a hard rule. The above code will run fine in a single-instance setup, or even with replication, but won't in the yet-released Redis Cluster.
+Ceci amène une seconde question : pourquoi les clées doivent elles être explicitement listées ? Chaque commande Redis sait, à l'exécution, quelles sont les clées qui vont être nécessaires. L'idée est que ceci puisse permettre l'existance de futurs outils, comme Redis Cluster, pour la distribution de requêtes sur de multiples serveurs Redis. Vous pourriez avoir noté que notre exemple ci-dessus lis les clées de manière dynamique (sans avoir à les passer à la commande `eval`). La commande `hget` est appelée pour tous les amis masculins de Leto. Ceci provient du fait que le fait de devoir disposer des clées en avance est plus une suggestion qu'un règle stricte. Le code ci-dessus s'exécutera sans problèmes sur une installation mono-instance, tout comme avec de la réplication, mais ne fonctionnera pas avec la version disponible de Redis Cluster.
 
-## Script Management
+## Gestion de scripts
 
-Even though scripts executed via `eval` are cached by Redis, sending the body every time you want to execute something isn't ideal. Instead, you can register the script with Redis and execute it's key. To do this you use the `script load` command, which returns the SHA1 digest of the script:
+Même si les scripts exécutés avec `eval` sont mis en cache par Redis, envoyer le corps de ce script à chaque fois que vous souhaitez exécuter quelque chose, n'est pas idéal. Au lieu de cela, il est possible d'enregistrer le script avec Redis et de l'exécuter avec sa clée. Pour réaliser cette opération, vous devez utiliser la commande `script load` qui retournera un hash (au sein digest du terme) SHA1 du script :
 
     redis = Redis.new
     script_key = redis.script(:load, "THE_SCRIPT")
 
-Once we've loaded the script, we can use `evalsha` to execute it:
+Une fois que nous aurons chargé le script, nous pourrons utiliser la commande `evalsha` pour l'exécuter :
 
     redis.evalsha(script_key, ['friends:leto'], ['m'])
 
-`script kill`, `script flush` and `script exists` are the other commands that you can use to manage Lua scripts. They are used to kill a running script, removing all scripts from the internal cache and seeing if a script already exists within the cache.
+Les autres commandes `script kill`, `script flush` et `script exists` vous permettrons de gérer entièrement les scripts chargés. Elles sont utilisée pour tuer un script en cours d'exécution, supprimer tous les scripts inclus dans le cache, et savoir si un script existe déjà dans le cache de Redis.
 
-## Libraries
+## Bibliothèques
 
 Redis' Lua implementation ships with a handful of useful libraries. While `table.lib`, `string.lib` and `math.lib` are quite useful, for me, `cjson.lib` is worth singling out. First, if you find yourself having to pass multiple arguments to a script, it might be cleaner to pass it as JSON:
 
