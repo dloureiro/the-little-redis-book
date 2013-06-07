@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>The-little-redis-book by dloureiro</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>The-little-redis-book</h1>
+        <h2>The little Redis book</h2>
+        <a href="https://github.com/dloureiro/the-little-redis-book" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h2>
+<a name="-propos" class="anchor" href="#-propos"><span class="octicon octicon-link"></span></a>À propos</h2>
+
+<p>Le petit livre sur Redis est un livre gratuit d'introduction à Redis.</p>
+
+<p>Le livre a été écrit par <a href="http://openmymind.net">Karl Seguin</a>, avec l'assistance de <a href="http://twitter.com/perryneal">Perry Neal</a>.</p>
+
+<p>Cette traduction française a été réalisée par <a href="http://twitter.com/DavidLoureiroFr">David Loureiro</a>, <a href="http://twitter.com/augustin82">Augustin Ragon</a> et <a href="http://twitter.com/hguemar">Haikel Guémar</a></p>
+
+<p>Si vous aimez ce livre, peut-être aimerez-vous <a href="https://github.com/dloureiro/the-little-mongodb-book">Le petit livre sur MongoDB</a>, traduction française réalisée par les mêmes personnes de <a href="http://openmymind.net/2011/3/28/The-Little-MongoDB-Book/">The Little MongoDB Book</a>, la version originale, aussi écrite par <a href="http://openmymind.net">Karl Seguin</a>, avec l'assistance de <a href="http://twitter.com/perryneal">Perry Neal</a>.  </p>
+
+<h2>
+<a name="licence" class="anchor" href="#licence"><span class="octicon octicon-link"></span></a>Licence</h2>
+
+<p>Ce livre est librement distribué sous la licence <a href="http://creativecommons.org/licenses/by-nc/3.0/legalcode">Attribution-NonCommercial 3.0 Unported license</a>.</p>
+
+<h2>
+<a name="version-originale-et-traductions" class="anchor" href="#version-originale-et-traductions"><span class="octicon octicon-link"></span></a>Version originale et Traductions</h2>
+
+<ul>
+<li><a href="https://github.com/dloureiro/the-little-redis-book">Version originale - Anglais</a></li>
+<li><a href="https://github.com/kondratovich/the-little-redis-book">Russe</a></li>
+<li>
+<a href="https://github.com/sandroconforto/the-little-redis-book">Italien</a> - <a href="https://github.com/sandroconforto/the-little-redis-book/raw/master/book/redisIt.pdf">pdf</a>
+</li>
+<li><a href="https://github.com/JasonLai256/the-little-redis-book">Chinois</a></li>
+<li><a href="https://github.com/craftgear/the-little-redis-book/">Japanais</a></li>
+</ul><h2>
+<a name="formats" class="anchor" href="#formats"><span class="octicon octicon-link"></span></a>Formats</h2>
+
+<p>Ce livre est rédigé en <a href="http://daringfireball.net/projects/markdown/">Markdown</a> et converti en PDF en utilisant <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>.</p>
+
+<p>Le template TeX fait usage de <a href="http://lenaherrmann.net/2010/05/20/javascript-syntax-highlighting-in-the-latex-listings-package">Lena Herrmann's JavaScript highlighter</a>.</p>
+
+<p>Les formats Kindle et ePub sont fournis par <a href="http://johnmacfarlane.net/pandoc/">Pandoc</a>. </p>
+
+<h2>
+<a name="gnration-des-livres" class="anchor" href="#gnration-des-livres"><span class="octicon octicon-link"></span></a>Génération des livres</h2>
+
+<p>Les paquets listés ci-dessous sont pour Ubunti. Si vous utilisez un autre Système d'Exploitation, les noms devraient être similaires.</p>
+
+<h3>
+<a name="pdf" class="anchor" href="#pdf"><span class="octicon octicon-link"></span></a>PDF</h3>
+
+<h4>
+<a name="dependances" class="anchor" href="#dependances"><span class="octicon octicon-link"></span></a>Dependances</h4>
+
+<p>Paquets:</p>
+
+<ul>
+<li><code>pandoc</code></li>
+<li><code>texlive-xetex</code></li>
+<li><code>texlive-latex-extra</code></li>
+<li><code>texlive-latex-recommended</code></li>
+</ul><p>Vous devriez aussi avec les polices Microsfts installées. Vous pouvez cependant changer les polices dans le fichier <code>common/pdf-template.tex</code> si vous le souhaitez.</p>
+
+<h4>
+<a name="construction" class="anchor" href="#construction"><span class="octicon octicon-link"></span></a>Construction</h4>
+
+<p>Exécutez <code>make fr/redis.pdf</code>.</p>
+
+<h3>
+<a name="epub" class="anchor" href="#epub"><span class="octicon octicon-link"></span></a>ePub</h3>
+
+<h4>
+<a name="dependances-1" class="anchor" href="#dependances-1"><span class="octicon octicon-link"></span></a>Dependances</h4>
+
+<p>Paquets:</p>
+
+<ul>
+<li><code>pandoc</code></li>
+</ul><h4>
+<a name="construction-1" class="anchor" href="#construction-1"><span class="octicon octicon-link"></span></a>Construction</h4>
+
+<p>Exécutez <code>make fr/redis.epub</code>.</p>
+
+<h3>
+<a name="mobi" class="anchor" href="#mobi"><span class="octicon octicon-link"></span></a>Mobi</h3>
+
+<h4>
+<a name="dependances-2" class="anchor" href="#dependances-2"><span class="octicon octicon-link"></span></a>Dependances</h4>
+
+<p>Paquets:</p>
+
+<ul>
+<li><code>pandoc</code></li>
+</ul><p>Vous devez aussi avoir <a href="http://www.amazon.com/gp/feature.html?ie=UTF8&amp;docId=1000765211">KindleGen</a> d'installé.</p>
+
+<h4>
+<a name="construction-2" class="anchor" href="#construction-2"><span class="octicon octicon-link"></span></a>Construction</h4>
+
+<p>Lancez <code>make fr/redis.mobi</code>.</p>
+
+<h2>
+<a name="image-de-titre" class="anchor" href="#image-de-titre"><span class="octicon octicon-link"></span></a>Image de titre</h2>
+
+<p>Un PSD de l'image de titre est inclus. La police utilisée est <a href="http://www.dafont.com/comfortaa.font">Comfortaa</a>.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/dloureiro/the-little-redis-book/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/dloureiro/the-little-redis-book/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/dloureiro/the-little-redis-book"></a> is maintained by <a href="https://github.com/dloureiro">dloureiro</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
